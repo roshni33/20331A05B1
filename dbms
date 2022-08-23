@@ -1,0 +1,437 @@
+#include<stdio.h>
+
+#include<stdlib.h>
+
+struct Employee
+
+{
+
+ int Emp_id;
+
+ char name[30];
+
+ float salary;
+
+}employee;
+
+void insert()
+
+{
+
+ FILE *fp;
+
+ fp = fopen("Record", "a");
+
+ printf("Enter the employee id   :");
+
+ scanf("%d", & employee.Emp_id);
+
+ printf("Enter the Name :");
+
+ scanf("%s",employee.name);
+
+ printf("Enter the salary :");
+
+ scanf("%f", & employee.salary);
+
+ fwrite(& employee, sizeof(employee), 1, fp);
+
+ fclose(fp);
+
+}
+
+void read()
+
+{
+
+ FILE *fp1;
+
+ fp1 = fopen("Record", "r");
+
+ printf("\nEmployee_id\tName\tSalary\n\n");
+
+ while (fread(& employee, sizeof(employee), 1, fp1))
+
+ printf("  %d\t\t%s\t%.2f\n", employee.Emp_id, employee.name, employee.salary);
+
+ fclose(fp1);
+
+}
+
+int available(int e_id)
+
+{
+
+ FILE *fp;
+
+ int c = 0;
+
+ fp = fopen("Record", "r");
+
+ while (!feof(fp))
+
+ {
+
+  fread(& employee, sizeof(employee), 1, fp);
+
+
+  if (e_id== employee.Emp_id)
+
+  {
+
+   fclose(fp);
+
+   return 1;
+
+  }
+
+ }
+
+ fclose(fp);
+
+ return 0;
+
+}
+
+void search()
+
+{
+
+ FILE *fp2;
+
+ int i, s, avl;
+
+ printf("\nEnter the employee id you want to search  :");
+
+ scanf("%d", &i);
+
+ avl = available(i);
+
+ if (avl == 0)
+
+  printf("Employee id %d is not available in the file\n",i);
+
+ else
+
+ {
+
+  fp2 = fopen("Record", "r");
+
+  while (fread(& employee, sizeof(employee), 1, fp2))
+
+  {
+
+   s = employee.Emp_id;
+
+   if (s == i)
+
+   {
+
+    printf("\nEmployee id = %d",employee.Emp_id);
+
+    printf("\nName    = %s", employee.name);
+
+    printf("\nSalary    = %.2f\n", employee.salary);
+
+   }
+
+  }
+
+  fclose(fp2);
+
+ }
+
+}
+
+
+void deletefile()
+
+{
+
+ FILE *fpo;
+
+ FILE *fpt;
+
+ int r, s;
+
+ printf("Enter the employee id you want to delete :");
+
+ scanf("%d", &r);
+
+ if (available(r) == 0)
+
+  printf("Employee id %d is not available in the file\n", r);
+
+ else
+
+ {
+
+  fpo = fopen("Record", "r");
+
+  fpt = fopen("TempFile", "w");
+
+  while (fread(& employee, sizeof(employee), 1, fpo))
+
+  {
+
+   s =employee.Emp_id;
+
+   if (s != r)
+
+    fwrite(& employee, sizeof(employee), 1, fpt);
+
+  }
+
+  fclose(fpo);
+
+  fclose(fpt);
+
+  fpo = fopen("Record", "w");
+
+  fpt = fopen("TempFile", "r");
+
+  while (fread(& employee, sizeof(employee), 1, fpt))
+
+   fwrite(& employee, sizeof(employee), 1, fpo);
+
+  printf("\nRECORD DELETED\n");
+
+  fclose(fpo);
+
+  fclose(fpt);
+
+ }
+
+
+}
+
+void update()
+
+{
+
+ int avl;
+
+ FILE *fpt;
+
+ FILE *fpo;
+
+ int s, r, ch;
+
+ printf("Enter employee id to update:");
+
+ scanf("%d", &r);
+
+ avl = available(r);
+
+ if (avl == 0)
+
+ {
+
+  printf("Employee id %d is not Available in the file", r);
+
+ }
+
+ else
+
+ {
+
+  fpo = fopen("Record", "r");
+
+  fpt = fopen("TempFile", "w");
+
+  while (fread(& employee, sizeof(employee), 1, fpo))
+
+  {
+
+   s = employee.Emp_id;
+
+   if (s != r)
+
+    fwrite(& employee, sizeof(employee), 1, fpt);
+
+   else
+
+   {
+
+    printf("\n\t1. Update Name of Employee id %d", r);
+
+    printf("\n\t2. Update salary of Employee id %d", r);
+
+    printf("\n\t3. Update both the parameters of Employee id %d", r);
+
+    printf("\nEnter your choice:");
+
+    scanf("%d", &ch);
+
+    switch (ch)
+
+    {
+
+    case 1:
+
+     printf("Enter Name:");
+
+     scanf("%s",employee.name);
+
+     break;
+
+    case 2:
+
+     printf("Enter salary : ");
+
+     scanf("%f", & employee.salary);
+
+     break;
+
+    case 3:
+
+     printf("Enter Name: ");
+
+     scanf("%s",employee.name);
+
+     printf("Enter salary: ");
+
+     scanf("%f", & employee.salary);
+
+     break;
+
+    default:
+
+     printf("Invalid Selection");
+
+     break;
+
+    }
+
+    fwrite(& employee, sizeof(employee), 1, fpt);
+
+   }
+
+  }
+
+  fclose(fpo);
+
+  fclose(fpt);
+
+  fpo = fopen("Record", "w");
+
+  fpt = fopen("TempFile", "r");
+
+  while (fread(& employee, sizeof(employee), 1, fpt))
+
+  {
+
+   fwrite(& employee, sizeof(employee), 1, fpo);
+
+  }
+
+  fclose(fpo);
+
+  fclose(fpt);
+
+  printf("RECORD UPDATED");
+
+ }
+
+}
+
+int check()
+
+{
+
+ int c = 0;
+
+ FILE *fp;
+
+ fp = fopen("Record", "r");
+
+ while (fread(& employee, sizeof(employee), 1, fp))
+
+  c = 1;
+
+ fclose(fp);
+
+ return c;
+
+}
+
+void main()
+
+{
+
+ int c, x;
+
+ do
+
+ {
+
+  printf("\n\tSelect your choice : \n");
+
+  printf("\n\t1. INSERT\n\t2. DISPLAY\n\t3. SEARCH\n\t4. DELETE\n\t5. UPDATE\n\t6. EXIT");
+
+  printf("\nEnter your choice:");
+
+  scanf("%d", &c);
+
+  printf("\n");
+
+  switch (c)
+
+  {
+
+  case 1:
+
+   insert();
+
+   break;
+
+  case 2:
+
+   x = check();
+
+   if (x == 0)
+
+    printf("\nThe file is EMPTY\n");
+
+   else
+
+    read();
+
+   break;
+
+  case 3:
+
+   search();
+
+   break;
+
+  case 4:
+
+   deletefile();
+
+   break;
+
+  case 5:
+
+   update();
+
+   break;
+
+  case 6:
+
+   exit(1);
+
+   break;
+
+  default:
+
+   printf("\nYour choice is wrong\nPlease try again...\n");
+
+   break;
+
+
+  }
+
+ } while (c != 6);
+
+}
